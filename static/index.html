@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Go Websocket</title>
+
+    <script type="text/javascript">
+
+        var ws = new WebSocket('ws://127.0.0.1:3000/ws');
+
+        ws.onopen = () => {
+
+            console.log("Connected");
+        }
+
+        ws.onmessage = (msg) => {
+
+            console.log("Server messsage:", msg.data);
+        }
+
+        ws.onclose = () => {
+
+            console.log("Diconnected");
+        }
+
+        window.ws = ws;
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>
