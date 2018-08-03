@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-var (
+const (
 	PUBLISH     = "publish"
 	SUBSCRIBE   = "subscribe"
 	UNSUBSCRIBE = "unsubscribe"
