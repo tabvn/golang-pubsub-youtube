@@ -55,7 +55,11 @@ func (ps *PubSub) RemoveClient(client Client) (*PubSub) {
 	for index, sub := range ps.Subscriptions {
 
 		if client.Id == sub.Client.Id {
-			ps.Subscriptions = append(ps.Subscriptions[:index], ps.Subscriptions[index+1:]...)
+			if index == len(ps.Subscriptions) {
+				ps.Subscriptions = ps.Subscriptions[:len(ps.Subscriptions)-1]
+			} else {
+				ps.Subscriptions = append(ps.Subscriptions[:index], ps.Subscriptions[index+1:]...)
+			}
 		}
 	}
 
@@ -64,7 +68,11 @@ func (ps *PubSub) RemoveClient(client Client) (*PubSub) {
 	for index, c := range ps.Clients {
 
 		if c.Id == client.Id {
-			ps.Clients = append(ps.Clients[:index], ps.Clients[index+1:]...)
+			if index == len(ps.Clients) {
+				ps.Clients = ps.Clients[:len(ps.Clients)-1]
+			} else {
+				ps.Clients = append(ps.Clients[:index], ps.Clients[index+1:]...)
+			}
 		}
 
 	}
@@ -141,8 +149,14 @@ func (ps *PubSub) Unsubscribe(client *Client, topic string) (*PubSub) {
 	for index, sub := range ps.Subscriptions {
 
 		if sub.Client.Id == client.Id && sub.Topic == topic {
-			// found this subscription from client and we do need remove it
-			ps.Subscriptions = append(ps.Subscriptions[:index], ps.Subscriptions[index+1:]...)
+			if index == len(ps.Subscriptions) {
+				// if subscription is the last element, just cut the slice length
+				ps.Subscriptions = ps.Subscriptions[:len(ps.Subscriptions)-1]
+			} else {
+				// found this subscription from client and we do need remove it
+				ps.Subscriptions = append(ps.Subscriptions[:index], ps.Subscriptions[index+1:]...)
+			}
+			
 		}
 	}
 
