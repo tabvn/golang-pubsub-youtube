@@ -1,9 +1,10 @@
 package pubsub
 
 import (
-	"github.com/gorilla/websocket"
 	"encoding/json"
 	"fmt"
+
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -33,7 +34,7 @@ type Subscription struct {
 	Client *Client
 }
 
-func (ps *PubSub) AddClient(client Client) (*PubSub) {
+func (ps *PubSub) AddClient(client Client) *PubSub {
 
 	ps.Clients = append(ps.Clients, client)
 
@@ -48,30 +49,32 @@ func (ps *PubSub) AddClient(client Client) (*PubSub) {
 
 }
 
-func (ps *PubSub) RemoveClient(client Client) (*PubSub) {
+func (ps *PubSub) RemoveClient(client Client) *PubSub {
 
 	// first remove all subscriptions by this client
 
-	for index, sub := range ps.Subscriptions {
-
+	for i := 0; i < len(ps.Subscriptions); i++ {
+		sub := ps.Subscriptions[i]
 		if client.Id == sub.Client.Id {
-			if index == len(ps.Subscriptions) {
+			if i == len(ps.Subscriptions)-1 {
 				ps.Subscriptions = ps.Subscriptions[:len(ps.Subscriptions)-1]
 			} else {
-				ps.Subscriptions = append(ps.Subscriptions[:index], ps.Subscriptions[index+1:]...)
+				ps.Subscriptions = append(ps.Subscriptions[:i], ps.Subscriptions[i+1:]...)
+				i--
 			}
 		}
 	}
 
 	// remove client from the list
 
-	for index, c := range ps.Clients {
-
+	for i := 0; i < len(ps.Clients); i++ {
+		c := ps.Clients[i]
 		if c.Id == client.Id {
-			if index == len(ps.Clients) {
+			if i == len(ps.Clients)-1 {
 				ps.Clients = ps.Clients[:len(ps.Clients)-1]
 			} else {
-				ps.Clients = append(ps.Clients[:index], ps.Clients[index+1:]...)
+				ps.Clients = append(ps.Clients[:i], ps.Clients[i+1:]...)
+				i--
 			}
 		}
 
@@ -80,7 +83,7 @@ func (ps *PubSub) RemoveClient(client Client) (*PubSub) {
 	return ps
 }
 
-func (ps *PubSub) GetSubscriptions(topic string, client *Client) ([]Subscription) {
+func (ps *PubSub) GetSubscriptions(topic string, client *Client) []Subscription {
 
 	var subscriptionList []Subscription
 
@@ -103,7 +106,7 @@ func (ps *PubSub) GetSubscriptions(topic string, client *Client) ([]Subscription
 	return subscriptionList
 }
 
-func (ps *PubSub) Subscribe(client *Client, topic string) (*PubSub) {
+func (ps *PubSub) Subscribe(client *Client, topic string) *PubSub {
 
 	clientSubs := ps.GetSubscriptions(topic, client)
 
@@ -137,26 +140,27 @@ func (ps *PubSub) Publish(topic string, message []byte, excludeClient *Client) {
 	}
 
 }
-func (client *Client) Send(message [] byte) (error) {
+func (client *Client) Send(message []byte) error {
 
 	return client.Connection.WriteMessage(1, message)
 
 }
 
-func (ps *PubSub) Unsubscribe(client *Client, topic string) (*PubSub) {
+func (ps *PubSub) Unsubscribe(client *Client, topic string) *PubSub {
 
 	//clientSubscriptions := ps.GetSubscriptions(topic, client)
-	for index, sub := range ps.Subscriptions {
-
+	for i := 0; i < len(ps.Subscriptions); i++ {
+		sub := ps.Subscriptions[i]
 		if sub.Client.Id == client.Id && sub.Topic == topic {
-			if index == len(ps.Subscriptions) {
+			if i == len(ps.Subscriptions)-1 {
 				// if subscription is the last element, just cut the slice length
 				ps.Subscriptions = ps.Subscriptions[:len(ps.Subscriptions)-1]
 			} else {
 				// found this subscription from client and we do need remove it
-				ps.Subscriptions = append(ps.Subscriptions[:index], ps.Subscriptions[index+1:]...)
+				ps.Subscriptions = append(ps.Subscriptions[:i], ps.Subscriptions[i+1:]...)
+				i--
 			}
-			
+
 		}
 	}
 
@@ -164,7 +168,7 @@ func (ps *PubSub) Unsubscribe(client *Client, topic string) (*PubSub) {
 
 }
 
-func (ps *PubSub) HandleReceiveMessage(client Client, messageType int, payload []byte) (*PubSub) {
+func (ps *PubSub) HandleReceiveMessage(client Client, messageType int, payload []byte) *PubSub {
 
 	m := Message{}
 

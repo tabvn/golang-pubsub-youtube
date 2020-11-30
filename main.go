@@ -1,11 +1,11 @@
 package main
 
 import (
-	"net/http"
 	"fmt"
 	"github.com/gorilla/websocket"
-	"log"
 	"github.com/satori/go.uuid"
+	"log"
+	"net/http"
 	"pubsub/pubsub"
 )
 
@@ -14,7 +14,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func autoId() (string) {
+func autoId() string {
 
 	return uuid.Must(uuid.NewV4()).String()
 }
@@ -33,7 +33,6 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	client := pubsub.Client{
 		Id:         autoId(),
 		Connection: conn,
@@ -51,7 +50,6 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 
 			ps.RemoveClient(client)
 			log.Println("total clients and subscriptions ", len(ps.Clients), len(ps.Subscriptions))
-
 
 			return
 		}
